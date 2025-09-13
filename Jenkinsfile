@@ -39,6 +39,8 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
+                    docker stop resturent || true
+                docker rm resturent || true
                     sh "docker run -d -p 8091:80 --name resturent ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
