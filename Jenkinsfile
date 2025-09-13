@@ -39,7 +39,7 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
-                    sh "docker run -d -p 8080:80 --name static-site ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker run -d -p 8091:80 --name static-site ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
         }
