@@ -1,24 +1,25 @@
 pipeline {
     agent any
-
     environment {
-        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'   // Jenkins credentials ID
-        IMAGE_NAME = 'vineethakondepudi/resturent'
-        IMAGE_TAG = '${BUILD_NUMBER}'
+        DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
+        IMAGE_NAME = 'vineethakondepudi/hotstar'
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        HOST_PORT = "8008"
+        CONTAINER_PORT = "8080"
     }
-
     stages {
-        stage('Checkout') {
+        stage('Build WAR') {
             steps {
-                checkout scm
+                sh 'mvn clean package'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                }
+                sh """
+                    docker rmi -f ${IMAGE_NAME}:${IMAGE_TAG} || true
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                """
             }
         }
 
@@ -36,18 +37,13 @@ pipeline {
             }
         }
 
-       stage('Run Container') {
-    steps {
-        script {
-            sh """
-              docker stop resturent || true
-              docker rm resturent || true
-              docker run -d -p 8091:80 --name resturent ${IMAGE_NAME}:${IMAGE_TAG}
-            """
+        stage('Deploy Container') {
+            steps {
+                sh """
+                    docker rm -f hotstar || true
+                    docker run -d --name hotstar -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
         }
     }
 }
-
-    }
-}
-
