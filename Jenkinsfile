@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Build WAR') {
             steps {
-                sh 'mvn clean package'
+               echo 'No build needed for static site'
             }
         }
 
